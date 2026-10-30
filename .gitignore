@@ -1,0 +1,38 @@
+# .NET build output
+**/bin/
+**/obj/
+**/out/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# User-specific configuration and secrets
+appsettings.*.json
+!appsettings.json
+secrets.json
+*.pfx
+*.p12
+
+# Test and coverage output
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Local tooling and operating system files
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node dependencies and build output (if frontend tooling is added)
+node_modules/
+wwwroot/dist/
