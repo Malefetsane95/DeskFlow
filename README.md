@@ -2,7 +2,7 @@
 
 DeskFlow is a learning and portfolio project for managing IT support requests from submission through assignment, investigation, resolution, and closure.
 
-The project is being built progressively with ASP.NET Core MVC, C#, Entity Framework Core, and PostgreSQL. Its interface is designed to feel calm and practical: clear ticket queues, restrained status colors, useful empty states, and role-specific navigation.
+The project is being built progressively with ASP.NET Core MVC, C#, Entity Framework Core, and PostgreSQL. 
 
 ## Project status
 
