@@ -30,9 +30,8 @@ Controllers handle HTTP concerns and authorization boundaries. Services enforce 
 
 ```text
 DeskFlow/
-├── docs/
-│   ├── architecture-and-roadmap.md
-│   └── database-erd.md
+├── architecture-and-roadmap.md
+├── database-erd.md
 ├── src/
 │   └── DeskFlow.Web/
 │       ├── Areas/

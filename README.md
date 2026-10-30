@@ -18,7 +18,7 @@ The project is being built progressively with ASP.NET Core MVC, C#, Entity Frame
 
 ## Technology
 
-- ASP.NET Core MVC and C# on .NET 8
+- ASP.NET Core MVC and C# on .NET 10 LTS
 - Entity Framework Core with Npgsql
 - PostgreSQL, with Supabase planned for hosted database and file storage
 - ASP.NET Core Identity
@@ -31,8 +31,8 @@ DeskFlow is being developed in small, verifiable phases. The database model and 
 
 ## Design documents
 
-- [System architecture and development roadmap](docs/architecture-and-roadmap.md)
-- [Database entity relationship diagram](docs/database-erd.md)
+- [System architecture and development roadmap](architecture-and-roadmap.md)
+- [Database entity relationship diagram](database-erd.md)
 
 ## Planned phases
 
