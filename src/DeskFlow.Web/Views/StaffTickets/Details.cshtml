@@ -20,6 +20,28 @@
                     </ol>
                 }
             </section>
+            <section class="conversation-section">
+                <h2 class="h5 mb-1">Conversation</h2><p class="text-muted small mb-3">Public replies are shared with the requester. Internal notes stay with the IT team.</p>
+                @if (TempData["CommentNotice"] is string commentNotice) { <div class="alert alert-success" role="status">@commentNotice</div> }
+                @if (Model.Conversation.Count == 0)
+                {
+                    <div class="conversation-empty">No one has replied yet.</div>
+                }
+                else
+                {
+                    <div class="conversation-list">
+                    @foreach (var message in Model.Conversation)
+                    {
+                        <article class="conversation-message @(message.Visibility.StartsWith("Internal", StringComparison.Ordinal) ? "internal-note" : "")"><header><strong>@message.Author</strong><span class="conversation-visibility">@message.Visibility</span><time class="text-muted small ms-auto" datetime="@message.CreatedAt.ToString("O")">@message.CreatedAt.ToLocalTime().ToString("d MMM 'at' h:mm tt")</time></header><p class="mb-0 conversation-body">@message.Body</p></article>
+                    }
+                    </div>
+                }
+                <form asp-action="AddComment" asp-route-id="@Model.Id" method="post" class="conversation-composer mt-3">
+                    <label for="Body" class="form-label">Write a reply or note</label>
+                    <textarea id="Body" name="Body" class="form-control" rows="4" maxlength="4000" required placeholder="Add what you learned, what you tried, or the next step"></textarea>
+                    <div class="row align-items-end g-2 mt-1"><div class="col-sm"><label for="Visibility" class="form-label small">Who can see this?</label><select id="Visibility" name="Visibility" class="form-select"><option value="Public">Public reply · requester can see</option><option value="Internal">Internal note · staff only</option></select></div><div class="col-sm-auto"><button class="btn btn-primary" type="submit">Add to conversation</button></div></div>
+                </form>
+            </section>
         </div>
         <aside class="col-lg-4">
             <section class="ticket-card mb-3"><h2 class="h6 mb-3">Requester</h2><p class="mb-1 fw-semibold">@Model.Requester</p><p class="small text-muted mb-1">@Model.RequesterEmail</p>@if (!string.IsNullOrWhiteSpace(Model.Department)) { <p class="small text-muted mb-0">@Model.Department</p> }</section>

@@ -1,6 +1,7 @@
 using DeskFlow.Web.Data;
 using DeskFlow.Web.Models;
 using DeskFlow.Web.ViewModels.Staff;
+using DeskFlow.Web.ViewModels.Tickets;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -86,6 +87,7 @@ public class StaffTicketsController : Controller
             .Include(item => item.Assignments.Where(assignment => assignment.UnassignedAt == null))
                 .ThenInclude(assignment => assignment.Technician).ThenInclude(user => user.Profile)
             .Include(item => item.History).ThenInclude(history => history.Actor).ThenInclude(user => user.Profile)
+            .Include(item => item.Comments).ThenInclude(comment => comment.Author).ThenInclude(user => user.Profile)
             .AsNoTracking()
             .SingleOrDefaultAsync(item => item.Id == id);
 
@@ -250,6 +252,48 @@ public class StaffTicketsController : Controller
         return RedirectToAction(nameof(Details), new { id });
     }
 
+    [HttpPost("{id:long}/comment")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddComment(long id, AddTicketCommentViewModel model)
+    {
+        var actorId = _users.GetUserId(User);
+        if (actorId is null) return Challenge();
+
+        if (string.IsNullOrWhiteSpace(model.Body))
+        {
+            TempData["StaffError"] = "Write a note or reply before sending it.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        if (!ModelState.IsValid)
+        {
+            TempData["StaffError"] = "Check the visibility and keep the message under 4,000 characters.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        var ticket = await _db.Tickets.SingleOrDefaultAsync(item => item.Id == id);
+        if (ticket is null) return NotFound();
+
+        var now = DateTimeOffset.UtcNow;
+        var comment = new TicketComment
+        {
+            TicketId = id,
+            AuthorId = actorId,
+            Visibility = model.Visibility,
+            Body = model.Body.Trim(),
+            CreatedAt = now
+        };
+        _db.TicketComments.Add(comment);
+        if (model.Visibility == CommentVisibility.Public && ticket.FirstRespondedAt is null)
+        {
+            ticket.FirstRespondedAt = now;
+        }
+        await _db.SaveChangesAsync();
+        TempData["StaffNotice"] = model.Visibility == CommentVisibility.Internal
+            ? "Internal note saved for the IT team."
+            : "Public reply sent to the requester.";
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
     private async Task<StaffTicketDetailViewModel> BuildDetailViewModelAsync(Ticket ticket)
     {
         var statuses = await _db.TicketStatuses.AsNoTracking().OrderBy(status => status.SortOrder)
@@ -295,6 +339,15 @@ public class StaffTicketsController : Controller
                     PreviousValue = history.PreviousValue,
                     NewValue = history.NewValue,
                     OccurredAt = history.OccurredAt
+                })
+                .ToList(),
+            Conversation = ticket.Comments.OrderBy(comment => comment.CreatedAt)
+                .Select(comment => new StaffTicketCommentViewModel
+                {
+                    Author = comment.Author.Profile?.DisplayName ?? comment.Author.Email ?? "DeskFlow",
+                    Body = comment.Body,
+                    Visibility = comment.Visibility == CommentVisibility.Internal ? "Internal note · staff only" : "Public reply",
+                    CreatedAt = comment.CreatedAt
                 })
                 .ToList()
         };

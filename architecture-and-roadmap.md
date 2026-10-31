@@ -112,7 +112,7 @@ dotnet tool run dotnet-ef database update --project src/DeskFlow.Web --startup-p
 
 Do not send the completed connection string in chat or commit it. `ApplicationDbContextFactory` has a clearly labeled migration-only fallback so EF Core can generate the initial migration before the real database exists; that fallback cannot connect to a database. In Development, the MVC shell runs without Identity when no connection string is set. Production startup fails fast if the connection string is missing.
 
-The solution builds, the first migration has been generated, and `dotnet-ef database update` reports that Supabase is already up to date. The foundation, account basics, and requester ticket flow are implemented. Staff queue and assignment work is tracked in [GitHub issue #1](https://github.com/Malefetsane95/DeskFlow/issues/1); the implementation currently exists in the local workspace and needs a local commit and push before it appears on the repository's `main` branch.
+The solution builds, the first migration has been generated, and `dotnet-ef database update` reports that Supabase is already up to date. Foundation, account, requester ticket, and staff queue workflows are implemented; [issue #1](https://github.com/Malefetsane95/DeskFlow/issues/1) is closed. Public ticket conversations and staff-only notes are tracked in [issue #2](https://github.com/Malefetsane95/DeskFlow/issues/2) and have been implemented locally.
 
 ## Development roadmap
 

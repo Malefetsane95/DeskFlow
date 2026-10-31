@@ -61,6 +61,16 @@ body {
 .timeline li { position: relative; display: flex; gap: .9rem; padding: 0 0 1.5rem; color: #48555a; }
 .timeline li:not(:last-child)::after { position: absolute; top: 12px; bottom: 0; left: 5px; width: 1px; background: #dedbd4; content: ""; }
 .timeline-dot { z-index: 1; flex: 0 0 11px; height: 11px; margin-top: 4px; border: 2px solid #75928d; border-radius: 50%; background: #fbfaf8; }
+.conversation-section { max-width: 780px; }
+.conversation-empty { padding: 1rem 1.15rem; border: 1px dashed #d9d6ce; border-radius: 8px; color: #6b7475; background: #f7f6f2; }
+.conversation-list { display: grid; gap: .75rem; }
+.conversation-message { padding: 1rem 1.1rem; border: 1px solid #e8e5df; border-radius: 9px; background: #fff; }
+.conversation-message header { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem; margin-bottom: .55rem; font-size: .9rem; }
+.conversation-body { white-space: pre-wrap; color: #48555a; line-height: 1.55; }
+.conversation-visibility { padding: .12rem .48rem; border-radius: 4px; background: #eaf1ef; color: #315d67; font-size: .75rem; }
+.internal-note { border-color: #e4d4af; background: #fbf7ed; }
+.internal-note .conversation-visibility { background: #f0e4c9; color: #76541e; }
+.conversation-composer { padding: 1.1rem; border: 1px solid #e8e5df; border-radius: 9px; background: #f8f7f4; }
 @media (max-width: 767px) { .staff-ticket-row { grid-template-columns: 1fr auto; gap: .6rem; } .staff-ticket-meta { grid-column: 1; } .staff-ticket-row time { grid-column: 2; grid-row: 1; } .staff-ticket-row .ticket-open { display: none; } }
 @media (max-width: 575px) { .ticket-row { grid-template-columns: 1fr auto; gap: .5rem; } .ticket-open { display: none; } .queue-filters { grid-template-columns: 1fr 1fr; } .queue-filters input { grid-column: 1 / -1; } }
 

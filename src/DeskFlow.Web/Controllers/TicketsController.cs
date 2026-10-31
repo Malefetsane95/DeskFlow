@@ -131,11 +131,55 @@ public class TicketsController : Controller
                     EventType = history.EventType,
                     NewValue = history.NewValue,
                     OccurredAt = history.OccurredAt
-                }).ToList()
+                }).ToList(),
+                Conversation = item.Comments
+                    .Where(comment => comment.Visibility == CommentVisibility.Public)
+                    .OrderBy(comment => comment.CreatedAt)
+                    .Select(comment => new TicketConversationItemViewModel
+                    {
+                        Author = comment.Author.Profile!.DisplayName,
+                        Body = comment.Body,
+                        CreatedAt = comment.CreatedAt
+                    })
+                    .ToList()
             })
             .SingleOrDefaultAsync();
 
         return ticket is null ? NotFound() : View(ticket);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddComment(long id, AddTicketCommentViewModel model)
+    {
+        var userId = _users.GetUserId(User);
+        if (userId is null) return Challenge();
+
+        if (string.IsNullOrWhiteSpace(model.Body))
+        {
+            TempData["CommentError"] = "Write a short reply before sending it.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        if (!ModelState.IsValid)
+        {
+            TempData["CommentError"] = "Your reply must be 4,000 characters or fewer.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        var ticketExists = await _db.Tickets.AnyAsync(ticket => ticket.Id == id && ticket.RequesterId == userId);
+        if (!ticketExists) return NotFound();
+
+        _db.TicketComments.Add(new TicketComment
+        {
+            TicketId = id,
+            AuthorId = userId,
+            Visibility = CommentVisibility.Public,
+            Body = model.Body.Trim(),
+            CreatedAt = DateTimeOffset.UtcNow
+        });
+        await _db.SaveChangesAsync();
+        TempData["CommentNotice"] = "Your reply has been added.";
+        return RedirectToAction(nameof(Details), new { id });
     }
 
     private async Task LoadCategoriesAsync()

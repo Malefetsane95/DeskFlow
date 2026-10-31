@@ -22,6 +22,15 @@ public class StaffTicketDetailViewModel
     public List<SelectListItem> Statuses { get; init; } = [];
     public List<SelectListItem> Technicians { get; init; } = [];
     public List<StaffTicketHistoryViewModel> History { get; init; } = [];
+    public List<StaffTicketCommentViewModel> Conversation { get; init; } = [];
+}
+
+public class StaffTicketCommentViewModel
+{
+    public string Author { get; init; } = string.Empty;
+    public string Body { get; init; } = string.Empty;
+    public string Visibility { get; init; } = string.Empty;
+    public DateTimeOffset CreatedAt { get; init; }
 }
 
 public class StaffTicketHistoryViewModel
