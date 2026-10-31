@@ -1,0 +1,33 @@
+@model DeskFlow.Web.ViewModels.Staff.StaffTicketListViewModel
+@{ ViewData["Title"] = "Team queue"; }
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div><p class="eyebrow mb-2">DESKFLOW · IT TEAM</p><h1 class="h3 mb-1">Team queue</h1><p class="text-muted mb-0">A shared view of requests waiting for a hand.</p></div>
+</div>
+@if (TempData["StaffNotice"] is string notice) { <div class="alert alert-success" role="status">@notice</div> }
+<form method="get" asp-action="Index" class="queue-filters mb-3">
+    <label class="visually-hidden" for="search">Search requests</label>
+    <input id="search" name="search" value="@Model.Search" class="form-control" placeholder="Search by person, request, or reference" />
+    <label class="visually-hidden" for="statusCode">Filter by status</label>
+    <select id="statusCode" name="statusCode" asp-items="Model.Statuses" class="form-select"><option value="">All statuses</option></select>
+    <button class="btn btn-outline-secondary" type="submit">Filter</button>
+    @if (!string.IsNullOrWhiteSpace(Model.Search) || !string.IsNullOrWhiteSpace(Model.StatusCode)) { <a asp-action="Index" class="btn btn-link text-secondary">Clear</a> }
+</form>
+@if (Model.Tickets.Count == 0)
+{
+    <div class="empty-state"><div class="empty-mark">✓</div><h2 class="h5">The queue is clear</h2><p class="text-muted mb-0">There are no requests matching this view.</p></div>
+}
+else
+{
+    <div class="queue-summary small text-muted mb-2">@Model.Tickets.Count request@(Model.Tickets.Count == 1 ? "" : "s") shown@if (Model.Tickets.Count == 150) { <span> · showing the first 150</span> }</div>
+    <div class="ticket-list staff-ticket-list">
+    @foreach (var ticket in Model.Tickets)
+    {
+        <a asp-action="Details" asp-route-id="@ticket.Id" class="staff-ticket-row">
+            <div class="staff-ticket-main"><span class="ticket-reference">@ticket.Reference</span><h2 class="h6 mb-1">@ticket.Title</h2><span class="text-muted small">@ticket.Requester · @ticket.Category</span></div>
+            <div class="staff-ticket-meta"><span class="priority-mark priority-@ticket.PriorityOrder">@ticket.Priority</span><span class="status-pill">@ticket.Status</span><span class="text-muted small">@(ticket.Technician ?? "Unassigned")</span></div>
+            <time class="text-muted small" datetime="@ticket.CreatedAt.ToString("O")">@ticket.CreatedAt.ToLocalTime().ToString("d MMM")</time>
+            <span class="ticket-open">›</span>
+        </a>
+    }
+    </div>
+}

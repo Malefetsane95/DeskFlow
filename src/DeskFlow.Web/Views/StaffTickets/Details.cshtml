@@ -1,0 +1,39 @@
+@model DeskFlow.Web.ViewModels.Staff.StaffTicketDetailViewModel
+@{ ViewData["Title"] = Model.Reference + " · Team"; }
+<div class="row justify-content-center"><div class="col-lg-9">
+    <a asp-action="Index" class="small text-muted text-decoration-none">← Team queue</a>
+    @if (TempData["StaffNotice"] is string notice) { <div class="alert alert-success mt-3" role="status">@notice</div> }
+    @if (TempData["StaffError"] is string error) { <div class="alert alert-warning mt-3" role="alert">@error</div> }
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mt-3 mb-4"><div><p class="ticket-reference mb-2">@Model.Reference · @Model.Category</p><h1 class="h3 mb-1">@Model.Title</h1><p class="text-muted mb-0">Sent by @Model.Requester on @Model.CreatedAt.ToLocalTime().ToString("d MMM yyyy 'at' h:mm tt")</p></div><span class="status-pill status-pill-large">@Model.Status</span></div>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <section class="ticket-card mb-4"><div class="d-flex justify-content-between gap-3"><h2 class="h6 mb-3">Request details</h2><span class="priority-mark priority-@Model.Priority.ToLowerInvariant()">@Model.Priority priority</span></div><p class="ticket-description mb-0">@Model.Description</p></section>
+            <section class="ticket-card mb-4"><h2 class="h6 mb-3">Activity</h2>
+                @if (Model.History.Count == 0) { <p class="text-muted mb-0">No activity has been recorded yet.</p> }
+                else
+                {
+                    <ol class="timeline mb-0">
+                    @foreach (var item in Model.History)
+                    {
+                        <li><span class="timeline-dot"></span><div><strong>@(item.EventType == "StatusChanged" ? "Status changed" : item.EventType)</strong>@if (!string.IsNullOrWhiteSpace(item.PreviousValue)) { <span> · @item.PreviousValue →</span> }@if (!string.IsNullOrWhiteSpace(item.NewValue)) { <span> @item.NewValue</span> }<div class="small text-muted">@item.Actor · @item.OccurredAt.ToLocalTime().ToString("d MMM yyyy 'at' h:mm tt")</div></div></li>
+                    }
+                    </ol>
+                }
+            </section>
+        </div>
+        <aside class="col-lg-4">
+            <section class="ticket-card mb-3"><h2 class="h6 mb-3">Requester</h2><p class="mb-1 fw-semibold">@Model.Requester</p><p class="small text-muted mb-1">@Model.RequesterEmail</p>@if (!string.IsNullOrWhiteSpace(Model.Department)) { <p class="small text-muted mb-0">@Model.Department</p> }</section>
+            <section class="ticket-card mb-3"><h2 class="h6 mb-2">Assigned to</h2><p class="text-muted small">@(Model.Technician ?? "No technician yet")</p>
+                @if (User.IsInRole(DeskFlow.Web.Models.ApplicationRoles.Technician) && Model.TechnicianId is null && Model.StatusCode is not ("RESOLVED" or "CLOSED"))
+                {
+                    <form asp-action="Claim" asp-route-id="@Model.Id" method="post"><button class="btn btn-outline-primary w-100" type="submit">I’ll take this</button></form>
+                }
+                @if (User.IsInRole(DeskFlow.Web.Models.ApplicationRoles.HelpdeskManager))
+                {
+                    <form asp-action="Assign" asp-route-id="@Model.Id" method="post" class="mt-3"><label class="form-label small" for="technicianId">Assign or reassign</label><select id="technicianId" name="technicianId" asp-items="Model.Technicians" class="form-select mb-2"><option value="">Choose a technician</option></select><button class="btn btn-outline-primary w-100" type="submit">Save assignment</button></form>
+                }
+            </section>
+            <section class="ticket-card"><h2 class="h6 mb-3">Update status</h2><form asp-action="UpdateStatus" asp-route-id="@Model.Id" method="post"><label class="visually-hidden" for="statusId">New status</label><select id="statusId" name="statusId" asp-items="Model.Statuses" class="form-select mb-2"></select><button class="btn btn-primary w-100" type="submit">Save status</button></form></section>
+        </aside>
+    </div>
+</div></div>

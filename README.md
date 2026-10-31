@@ -6,7 +6,7 @@ The project is being built progressively with ASP.NET Core MVC, C#, Entity Frame
 
 ## Project status
 
-**Phase 1 – Project foundation** is complete locally. The MVC solution builds, the normalized EF Core model has an initial migration, and EF Core reports that the connected Supabase database has no pending migrations.
+**Project foundation and requester accounts are in place.** Users can register, sign in, update their profile, submit a request, and track its status. The staff queue and assignment workflow in [issue #1](https://github.com/Malefetsane95/DeskFlow/issues/1) is implemented locally and builds successfully.
 
 ## Planned capabilities
 
