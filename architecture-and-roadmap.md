@@ -30,8 +30,13 @@ Controllers handle HTTP concerns and authorization boundaries. Services enforce 
 
 ```text
 DeskFlow/
+├── .gitignore
+├── DeskFlow.sln
+├── dotnet-tools.json
+├── global.json
 ├── architecture-and-roadmap.md
 ├── database-erd.md
+├── README.md
 ├── src/
 │   └── DeskFlow.Web/
 │       ├── Areas/
@@ -76,18 +81,18 @@ See [database-erd.md](database-erd.md) for the ER diagram and relationship expla
 
 ## Required software and services
 
-1. **.NET 10 SDK** for building and running the application. This machine currently has .NET SDK 8 and 9, but not 10, so the app scaffold must wait until the .NET 10 SDK is installed.
+1. **.NET 10 SDK** for building and running the application. SDK 10.0.403 is installed and selected by `global.json`.
 2. **Visual Studio** with the ASP.NET and web development workload, or a code editor plus the .NET SDK.
 3. **Git**. Git is already installed and this repository tracks GitHub's `main` branch.
 4. **A Supabase account and project** for hosted PostgreSQL and private object storage. We can build most of the foundation locally before connecting it.
 5. **A modern browser** for running and checking the MVC interface.
-6. Later, the .NET CLI tool `dotnet-ef` for creating and applying EF Core migrations. We will install it after the app project and EF packages are in place.
+6. **The local .NET CLI tool `dotnet-ef`** for creating and applying EF Core migrations. Version 10.0.14 is pinned in `dotnet-tools.json`.
 
 PostgreSQL command-line tools or a database GUI are optional; Supabase's dashboard is enough for initial project setup.
 
 ## Initial Supabase configuration requirements
 
-Create a Supabase project and keep the following values available locally:
+To apply the migration, create a Supabase project and keep the following values available locally:
 
 - Project reference and region.
 - Database password.
@@ -98,7 +103,16 @@ For local development, choose the database connection mode based on the network.
 
 Store secrets with ASP.NET Core User Secrets during development and environment variables in deployment. Never put a password, database URL, Supabase service-role key, or storage secret in `appsettings.json`, JavaScript, or Git. Store ticket attachments in a private bucket; a public bucket would allow anyone with a file URL to retrieve its contents.
 
-We do not need to create the Supabase project or share its credentials to finish the initial MVC scaffold. When we reach the database connection step, use your own dashboard and keep the password private.
+For this .NET project, convert the host, port, database, username, and password shown by Supabase into Npgsql's `keyword=value;` format. Then run this template from the repository root after replacing each placeholder locally:
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=<host>;Port=5432;Database=postgres;Username=<username>;Password=<database-password>;SSL Mode=Require" --project src/DeskFlow.Web
+dotnet tool run dotnet-ef database update --project src/DeskFlow.Web --startup-project src/DeskFlow.Web
+```
+
+Do not send the completed connection string in chat or commit it. `ApplicationDbContextFactory` has a clearly labeled migration-only fallback so EF Core can generate the initial migration before the real database exists; that fallback cannot connect to a database. In Development, the MVC shell runs without Identity when no connection string is set. Production startup fails fast if the connection string is missing.
+
+The solution builds, the first migration has been generated, and `dotnet-ef database update` reports that Supabase is already up to date. Phase 1's foundation checkpoint is complete. The project source is currently in the local workspace; it has not yet been committed to GitHub.
 
 ## Development roadmap
 

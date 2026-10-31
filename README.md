@@ -6,7 +6,7 @@ The project is being built progressively with ASP.NET Core MVC, C#, Entity Frame
 
 ## Project status
 
-**Phase 1 – Project foundation** is in progress. The architecture and database design are documented before the application schema is implemented.
+**Phase 1 – Project foundation** is complete locally. The MVC solution builds, the normalized EF Core model has an initial migration, and EF Core reports that the connected Supabase database has no pending migrations.
 
 ## Planned capabilities
 
@@ -28,6 +28,31 @@ The project is being built progressively with ASP.NET Core MVC, C#, Entity Frame
 ## Development approach
 
 DeskFlow is being developed in small, verifiable phases. The database model and relationships will be documented before migrations are introduced. Secrets such as database connection strings and Supabase service keys must stay outside source control.
+
+## Build the starter application
+
+From the repository root:
+
+```powershell
+dotnet tool restore
+dotnet restore DeskFlow.sln
+dotnet build DeskFlow.sln
+```
+
+The MVC shell can run locally without a database connection. Identity and database-backed features become available after `ConnectionStrings:DefaultConnection` is set in User Secrets.
+
+To set the database connection locally, replace the example values with the host, port, and username from Supabase's **Connect** panel, then run this command in your terminal. Keep the actual connection string private:
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=<host>;Port=5432;Database=postgres;Username=<username>;Password=<database-password>;SSL Mode=Require" --project src/DeskFlow.Web
+```
+
+Apply the schema and start the web app after the secret is set:
+
+```powershell
+dotnet tool run dotnet-ef database update --project src/DeskFlow.Web --startup-project src/DeskFlow.Web
+dotnet run --project src/DeskFlow.Web
+```
 
 ## Design documents
 

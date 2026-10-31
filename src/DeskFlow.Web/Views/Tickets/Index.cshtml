@@ -1,0 +1,24 @@
+@model IReadOnlyList<DeskFlow.Web.ViewModels.Tickets.TicketListItemViewModel>
+@{ ViewData["Title"] = "My requests"; }
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div><p class="eyebrow mb-2">YOUR IT SUPPORT</p><h1 class="h3 mb-1">My requests</h1><p class="text-muted mb-0">See what’s happening with the things you’ve asked us to fix.</p></div>
+    <a asp-action="Create" class="btn btn-primary">Ask for help</a>
+</div>
+@if (TempData["TicketCreated"] is string reference) { <div class="alert alert-success" role="status">Your request <strong>@reference</strong> is with the IT team now.</div> }
+@if (Model.Count == 0)
+{
+    <div class="empty-state"><div class="empty-mark">+</div><h2 class="h5">Nothing here just yet</h2><p class="text-muted">When you ask the IT team for help, your requests will show up here.</p><a asp-action="Create" class="btn btn-primary">Create your first request</a></div>
+}
+else
+{
+    <div class="ticket-list">
+    @foreach (var ticket in Model)
+    {
+        <a asp-action="Details" asp-route-id="@ticket.Id" class="ticket-row">
+            <div class="ticket-row-main"><span class="ticket-reference">@ticket.Reference</span><h2 class="h6 mb-1">@ticket.Title</h2><span class="text-muted small">@ticket.Category · Sent @ticket.CreatedAt.ToLocalTime().ToString("d MMM yyyy")</span></div>
+            <span class="status-pill">@ticket.Status</span><span class="ticket-open">›</span>
+        </a>
+    }
+    </div>
+    @if (Model.Count == 100) { <p class="small text-muted mt-3">Showing your 100 most recent requests.</p> }
+}

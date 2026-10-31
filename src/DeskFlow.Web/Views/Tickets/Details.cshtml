@@ -1,0 +1,20 @@
+@model DeskFlow.Web.ViewModels.Tickets.TicketDetailViewModel
+@{ ViewData["Title"] = Model.Reference; }
+<div class="row justify-content-center"><div class="col-lg-8">
+    <a asp-action="Index" class="small text-muted text-decoration-none">← My requests</a>
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mt-3 mb-4"><div><span class="ticket-reference">@Model.Reference</span><h1 class="h3 mt-2 mb-1">@Model.Title</h1><p class="text-muted mb-0">Sent @Model.CreatedAt.ToLocalTime().ToString("d MMM yyyy 'at' h:mm tt")</p></div><span class="status-pill status-pill-large">@Model.Status</span></div>
+    @if (TempData["TicketCreated"] is not null) { <div class="alert alert-success">Your request is with the IT team. We’ll keep this page up to date.</div> }
+    <section class="ticket-card mb-4"><h2 class="h6">What you told us</h2><p class="ticket-description">@Model.Description</p><div class="ticket-meta"><span><strong>Area</strong> @Model.Category</span><span><strong>Priority</strong> @Model.Priority</span></div></section>
+    <section><h2 class="h5 mb-3">Updates</h2>
+        @if (Model.History.Count == 0) { <p class="text-muted">The IT team hasn’t posted an update yet. Your request is in the queue.</p> }
+        else
+        {
+            <ol class="timeline">
+            @foreach (var update in Model.History)
+            {
+                <li><span class="timeline-dot"></span><div><strong>@(update.EventType == "Created" ? "Request received" : update.EventType)</strong>@if (!string.IsNullOrWhiteSpace(update.NewValue)) { <span> · @update.NewValue</span> }<div class="small text-muted">@update.OccurredAt.ToLocalTime().ToString("d MMM yyyy 'at' h:mm tt")</div></div></li>
+            }
+            </ol>
+        }
+    </section>
+</div></div>

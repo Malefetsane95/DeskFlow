@@ -1,0 +1,16 @@
+@model DeskFlow.Web.ViewModels.Tickets.CreateTicketViewModel
+@{ ViewData["Title"] = "Ask for IT help"; }
+<div class="row justify-content-center"><div class="col-lg-7">
+    <a asp-action="Index" class="small text-muted text-decoration-none">← My requests</a>
+    <h1 class="h3 mt-3 mb-2">Tell us what’s going on</h1>
+    <p class="text-muted mb-4">A few details will help the IT team get started. You can add more context later.</p>
+    <form asp-action="Create" method="post" class="ticket-form">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div class="mb-4"><label asp-for="Title" class="form-label"></label><input asp-for="Title" class="form-control form-control-lg" placeholder="For example, “I can’t connect to the office Wi-Fi”" /><span asp-validation-for="Title" class="text-danger"></span></div>
+        <div class="mb-4"><label asp-for="CategoryId" class="form-label"></label><select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select"><option value="">Choose the closest match</option></select><span asp-validation-for="CategoryId" class="text-danger"></span></div>
+        <div class="mb-4"><label asp-for="Description" class="form-label"></label><textarea asp-for="Description" class="form-control" rows="6" placeholder="What were you trying to do? What happened instead? Include any error message you saw."></textarea><div class="form-text">Please don’t include passwords or other sensitive information.</div><span asp-validation-for="Description" class="text-danger"></span></div>
+        <button type="submit" class="btn btn-primary">Send to the IT team</button>
+        <a asp-action="Index" class="btn btn-link text-secondary">Cancel</a>
+    </form>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

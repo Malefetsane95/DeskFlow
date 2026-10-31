@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "IT support that feels human";
+}
+
+<section class="home-intro">
+    <p class="eyebrow">YOUR IT SUPPORT DESK</p>
+    <h1>Something not working?<br />We’ll help you sort it out.</h1>
+    <p class="lead">Tell us what’s going on. A real person from the IT team will pick it up and keep you posted.</p>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <a class="btn btn-primary btn-lg" asp-controller="Tickets" asp-action="Create">Get help</a>
+        <a class="btn btn-outline-secondary btn-lg ms-2" asp-controller="Tickets" asp-action="Index">See my requests</a>
+    }
+    else
+    {
+        <a class="btn btn-primary btn-lg" asp-controller="Account" asp-action="Register">Get started</a>
+        <a class="btn btn-outline-secondary btn-lg ms-2" asp-controller="Account" asp-action="Login">Sign in</a>
+    }
+</section>
+<section class="home-note mt-5">
+    <h2 class="h5">A couple of useful things</h2>
+    <p class="mb-1">The more detail you can share, the quicker we can help.</p>
+    <p class="mb-0">If something is stopping you from working, let us know in the description.</p>
+</section>

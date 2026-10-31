@@ -32,6 +32,8 @@ coverage/
 .DS_Store
 Thumbs.db
 desktop.ini
+/work/
+/outputs/
 
 # Node dependencies and build output (if frontend tooling is added)
 node_modules/
