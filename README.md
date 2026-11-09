@@ -62,6 +62,8 @@ dotnet user-secrets set "Supabase:SecretKey" "<your-supabase-secret-key>" --proj
 
 In Supabase Storage, create a bucket named `ticket-attachments` and leave **Public bucket** turned off. DeskFlow checks the ticket's requester or staff role before issuing a five-minute download link. Uploads allow PNG, JPG, PDF, TXT, and LOG files up to 10 MB each, with five files per ticket.
 
+Helpdesk Managers can set first-response and resolution targets from 15 minutes to 30 calendar days in 15-minute increments at **SLA targets**. Changes apply immediately to staff SLA progress indicators.
+
 ## Design documents
 
 - [System architecture and development roadmap](architecture-and-roadmap.md)

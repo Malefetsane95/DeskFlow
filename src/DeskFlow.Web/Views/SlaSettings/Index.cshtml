@@ -1,0 +1,44 @@
+@model DeskFlow.Web.ViewModels.Staff.SlaTargetsViewModel
+@{ ViewData["Title"] = "SLA targets"; }
+<div class="row justify-content-center"><div class="col-xl-9">
+    <a asp-controller="StaffTickets" asp-action="Index" class="small text-muted text-decoration-none">← Team queue</a>
+    <header class="mt-3 mb-4">
+        <p class="eyebrow mb-2">IT TEAM SETTINGS</p>
+        <h1 class="h3 mb-1">SLA targets</h1>
+        <p class="text-muted mb-0">Set how quickly the team should reply and resolve each priority of request.</p>
+    </header>
+    @if (TempData["SlaNotice"] is string notice) { <div class="alert alert-success" role="status">@notice</div> }
+    <form asp-action="Save" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-warning" role="alert"></div>
+        <div class="sla-settings-list">
+        @for (var index = 0; index < Model.Rules.Count; index++)
+        {
+            <section class="sla-settings-row" aria-labelledby="priority-@Model.Rules[index].PriorityId">
+                <input asp-for="Rules[index].PriorityId" type="hidden" />
+                <div class="sla-settings-priority">
+                    <h2 id="priority-@Model.Rules[index].PriorityId" class="h6 mb-1">@Model.Rules[index].PriorityName</h2>
+                    <p class="small text-muted mb-0">Use 15-minute steps · 0.25 hours = 15 minutes</p>
+                </div>
+                <div class="sla-settings-fields">
+                    <div>
+                        <label asp-for="Rules[index].ResponseTargetHours" class="form-label small"></label>
+                        <div class="input-group"><input asp-for="Rules[index].ResponseTargetHours" class="form-control" type="number" min="0.25" max="720" step="0.25" inputmode="decimal" /><span class="input-group-text">hours</span></div>
+                        <span asp-validation-for="Rules[index].ResponseTargetHours" class="field-validation-error small"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Rules[index].ResolutionTargetHours" class="form-label small"></label>
+                        <div class="input-group"><input asp-for="Rules[index].ResolutionTargetHours" class="form-control" type="number" min="0.25" max="720" step="0.25" inputmode="decimal" /><span class="input-group-text">hours</span></div>
+                        <span asp-validation-for="Rules[index].ResolutionTargetHours" class="field-validation-error small"></span>
+                    </div>
+                </div>
+            </section>
+        }
+        </div>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mt-4">
+            <p class="small text-muted mb-0">Targets use calendar hours and can be set from 15 minutes to 30 days.</p>
+            <button type="submit" class="btn btn-primary">Save targets</button>
+        </div>
+    </form>
+</div></div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
