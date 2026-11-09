@@ -20,6 +20,8 @@ public class StaffTicketDetailViewModel
     public string? TechnicianId { get; init; }
     public string? Technician { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
+    public SlaProgressViewModel ResponseSla { get; init; } = new();
+    public SlaProgressViewModel ResolutionSla { get; init; } = new();
     public List<SelectListItem> Statuses { get; init; } = [];
     public List<SelectListItem> Technicians { get; init; } = [];
     public List<StaffTicketHistoryViewModel> History { get; init; } = [];

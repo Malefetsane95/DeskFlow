@@ -13,4 +13,10 @@ public class StaffTicketRowViewModel
     public string StatusCode { get; init; } = string.Empty;
     public string? Technician { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
+    public int? ResponseTargetMinutes { get; init; }
+    public int? ResolutionTargetMinutes { get; init; }
+    public DateTimeOffset? FirstRespondedAt { get; init; }
+    public DateTimeOffset? ResolvedAt { get; init; }
+    public SlaProgressViewModel ResponseSla { get; set; } = new();
+    public SlaProgressViewModel ResolutionSla { get; set; } = new();
 }

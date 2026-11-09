@@ -87,9 +87,24 @@ public class StaffTicketsController : Controller
                 StatusCode = ticket.Status.Code,
                 Technician = ticket.Assignments.Where(assignment => assignment.UnassignedAt == null)
                     .Select(assignment => assignment.Technician.Profile!.DisplayName).FirstOrDefault(),
-                CreatedAt = ticket.CreatedAt
+                CreatedAt = ticket.CreatedAt,
+                ResponseTargetMinutes = ticket.Priority.SlaRule != null && ticket.Priority.SlaRule.IsActive
+                    ? ticket.Priority.SlaRule.ResponseTargetMinutes : null,
+                ResolutionTargetMinutes = ticket.Priority.SlaRule != null && ticket.Priority.SlaRule.IsActive
+                    ? ticket.Priority.SlaRule.ResolutionTargetMinutes : null,
+                FirstRespondedAt = ticket.FirstRespondedAt,
+                ResolvedAt = ticket.ResolvedAt
             })
             .ToListAsync();
+
+        var now = DateTimeOffset.UtcNow;
+        foreach (var row in rows)
+        {
+            row.ResponseSla = SlaProgressCalculator.Calculate(
+                "Reply", row.CreatedAt, row.ResponseTargetMinutes, row.FirstRespondedAt, now);
+            row.ResolutionSla = SlaProgressCalculator.Calculate(
+                "Resolution", row.CreatedAt, row.ResolutionTargetMinutes, row.ResolvedAt, now);
+        }
 
         var statuses = await _db.TicketStatuses.AsNoTracking().OrderBy(status => status.SortOrder)
             .Select(status => new SelectListItem(status.Name, status.Code, status.Code == statusCode))
@@ -111,7 +126,7 @@ public class StaffTicketsController : Controller
         var ticket = await _db.Tickets
             .Include(item => item.Requester).ThenInclude(user => user.Profile)
             .Include(item => item.Category)
-            .Include(item => item.Priority)
+            .Include(item => item.Priority).ThenInclude(priority => priority.SlaRule)
             .Include(item => item.Status)
             .Include(item => item.Assignments.Where(assignment => assignment.UnassignedAt == null))
                 .ThenInclude(assignment => assignment.Technician).ThenInclude(user => user.Profile)
@@ -359,6 +374,14 @@ public class StaffTicketsController : Controller
             TechnicianId = currentAssignment?.TechnicianId,
             Technician = currentAssignment?.Technician.Profile?.DisplayName,
             CreatedAt = ticket.CreatedAt,
+            ResponseSla = SlaProgressCalculator.Calculate(
+                "First reply", ticket.CreatedAt,
+                ticket.Priority.SlaRule is { IsActive: true } ? ticket.Priority.SlaRule.ResponseTargetMinutes : null,
+                ticket.FirstRespondedAt, DateTimeOffset.UtcNow),
+            ResolutionSla = SlaProgressCalculator.Calculate(
+                "Resolution", ticket.CreatedAt,
+                ticket.Priority.SlaRule is { IsActive: true } ? ticket.Priority.SlaRule.ResolutionTargetMinutes : null,
+                ticket.ResolvedAt, DateTimeOffset.UtcNow),
             Statuses = statuses,
             Technicians = technicians
                 .OrderBy(user => technicianProfiles.GetValueOrDefault(user.Id, user.Email ?? "IT Technician"))
@@ -406,8 +429,6 @@ public class StaffTicketsController : Controller
         var previousStatus = ticket.Status;
         ticket.Status = nextStatus;
         ticket.StatusId = nextStatus.Id;
-        if (ticket.FirstRespondedAt is null) ticket.FirstRespondedAt = now;
-
         if (code == "RESOLVED") ticket.ResolvedAt = now;
         else if (code == "CLOSED")
         {

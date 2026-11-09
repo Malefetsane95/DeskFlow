@@ -8,6 +8,19 @@
     <div class="row g-4">
         <div class="col-lg-8">
             <section class="ticket-card mb-4"><div class="d-flex justify-content-between gap-3"><h2 class="h6 mb-3">Request details</h2><span class="priority-mark priority-@Model.Priority.ToLowerInvariant()">@Model.Priority priority</span></div><p class="ticket-description mb-0">@Model.Description</p></section>
+            <section class="ticket-card mb-4" aria-labelledby="sla-heading">
+                <h2 id="sla-heading" class="h6 mb-1">Service targets</h2>
+                <p class="text-muted small mb-3">Based on the @Model.Priority priority target and calendar hours.</p>
+                <div class="sla-detail-list">
+                    @foreach (var sla in new[] { Model.ResponseSla, Model.ResolutionSla })
+                    {
+                        <div class="sla-detail-row">
+                            <div><strong>@sla.Name</strong>@if (sla.DueAt is DateTimeOffset dueAt) { <div class="small text-muted">Due @dueAt.ToLocalTime().ToString("d MMM yyyy 'at' h:mm tt")</div> }</div>
+                            <div class="text-end"><span class="sla-state sla-@sla.StateClass">@sla.State</span><div class="small text-muted mt-1">@sla.Summary</div></div>
+                        </div>
+                    }
+                </div>
+            </section>
             <section class="ticket-card mb-4">
                 <div class="d-flex justify-content-between align-items-baseline gap-3"><h2 class="h6 mb-3">Attachments</h2><span class="small text-muted">@Model.Attachments.Count of 5</span></div>
                 @if (Model.Attachments.Count == 0) { <p class="text-muted small">No files attached yet.</p> }

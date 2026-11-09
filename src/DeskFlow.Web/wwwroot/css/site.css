@@ -58,6 +58,15 @@ body {
 .priority-3, .priority-high { background: #f8efdf; color: #8a5a13; }
 .priority-2, .priority-medium { background: #eaf1f5; color: #315d67; }
 .priority-1, .priority-low { background: #efefed; color: #626b6c; }
+.sla-queue-item { display: inline-flex; align-items: center; gap: .28rem; color: #6a7373; font-size: .74rem; white-space: nowrap; }
+.sla-state { display: inline-block; padding: .18rem .48rem; border-radius: 999px; background: #f0f1ee; color: #5d6765; font-size: .76rem; font-weight: 600; white-space: nowrap; }
+.sla-on-track, .sla-met { background: #eaf1ef; color: #315d67; }
+.sla-due-soon { background: #f8efdf; color: #8a5a13; }
+.sla-overdue, .sla-late { background: #f7e9e7; color: #9b3329; }
+.sla-none { background: #f0f1ee; color: #6a7373; }
+.sla-detail-list { display: grid; }
+.sla-detail-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .85rem 0; border-top: 1px solid #eeece7; }
+.sla-detail-row:first-child { border-top: 0; padding-top: .35rem; }
 .ticket-card { padding: 1.4rem; border: 1px solid #e8e5df; border-radius: 10px; background: #fff; }
 .ticket-description { color: #48555a; white-space: pre-wrap; line-height: 1.65; }
 .ticket-meta { display: flex; flex-wrap: wrap; gap: 1.5rem; padding-top: 1rem; border-top: 1px solid #eeece7; color: #616c70; font-size: .9rem; }

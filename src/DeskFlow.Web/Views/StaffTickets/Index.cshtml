@@ -30,7 +30,7 @@ else
     {
         <a asp-action="Details" asp-route-id="@ticket.Id" class="staff-ticket-row">
             <div class="staff-ticket-main"><span class="ticket-reference">@ticket.Reference</span><h2 class="h6 mb-1">@ticket.Title</h2><span class="text-muted small">@ticket.Requester · @ticket.Category</span></div>
-            <div class="staff-ticket-meta"><span class="priority-mark priority-@ticket.PriorityOrder">@ticket.Priority</span><span class="status-pill">@ticket.Status</span><span class="text-muted small">@(ticket.Technician ?? "Unassigned")</span></div>
+            <div class="staff-ticket-meta"><span class="priority-mark priority-@ticket.PriorityOrder">@ticket.Priority</span><span class="status-pill">@ticket.Status</span><span class="text-muted small">@(ticket.Technician ?? "Unassigned")</span><span class="sla-queue-item"><span>Reply</span><span class="sla-state sla-@ticket.ResponseSla.StateClass">@ticket.ResponseSla.State</span></span><span class="sla-queue-item"><span>Resolve</span><span class="sla-state sla-@ticket.ResolutionSla.StateClass">@ticket.ResolutionSla.State</span></span></div>
             <time class="text-muted small" datetime="@ticket.CreatedAt.ToString("O")">@ticket.CreatedAt.ToLocalTime().ToString("d MMM")</time>
             <span class="ticket-open">›</span>
         </a>
