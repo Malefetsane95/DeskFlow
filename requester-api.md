@@ -2,6 +2,8 @@
 
 DeskFlow exposes a read-only API for signed-in End Users. The API uses the existing ASP.NET Core Identity cookie session; it does not issue API tokens. Requests must be authenticated and have the `End User` role.
 
+In Development, open `/swagger` in the same browser after signing in to DeskFlow to explore and try the endpoints. Swagger UI sends same-origin requests with the existing session cookie. The generated OpenAPI document is available at `/openapi/requester.json`. Both documentation routes are enabled only in Development and are unavailable in Production.
+
 All endpoints return JSON and use UTC ISO 8601 timestamps. Every ticket query is restricted to the signed-in user's tickets. Requests for another user's ticket return `404 Not Found`, so the endpoint does not reveal whether that ticket exists.
 
 ## List tickets

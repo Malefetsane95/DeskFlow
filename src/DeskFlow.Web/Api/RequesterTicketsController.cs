@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 using DeskFlow.Web.Data;
 using DeskFlow.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DeskFlow.Web.Api;
 
 [ApiController]
+[ApiExplorerSettings(GroupName = "requester")]
 [Route("api/requester/tickets")]
 [Authorize(Roles = ApplicationRoles.EndUser)]
 public sealed class RequesterTicketsController : ControllerBase
@@ -24,6 +26,8 @@ public sealed class RequesterTicketsController : ControllerBase
     }
 
     [HttpGet]
+    [EndpointSummary("List your tickets")]
+    [EndpointDescription("Returns the signed-in End User's own tickets with bounded pagination and optional status and search filters.")]
     [ProducesResponseType(typeof(PagedResponse<RequesterTicketListItemDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -81,6 +85,8 @@ public sealed class RequesterTicketsController : ControllerBase
     }
 
     [HttpGet("{id:long}")]
+    [EndpointSummary("Get a ticket and its public replies")]
+    [EndpointDescription("Returns a ticket only when it belongs to the signed-in End User. Internal notes and staff-only fields are excluded.")]
     [ProducesResponseType(typeof(RequesterTicketDetailDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -124,15 +130,19 @@ public sealed class RequesterTicketsController : ControllerBase
 
 public sealed class RequesterTicketQuery
 {
+    [Description("One-based page number. Values from 1 to 1,000,000 are accepted.")]
     [Range(1, 1_000_000)]
     public int Page { get; set; } = 1;
 
+    [Description("Number of tickets per page. Values from 1 to 100 are accepted.")]
     [Range(1, 100)]
     public int PageSize { get; set; } = 20;
 
+    [Description("Optional ticket status code, up to 30 characters.")]
     [StringLength(30)]
     public string? StatusCode { get; set; }
 
+    [Description("Optional search across ticket reference, title, and category, up to 100 characters.")]
     [StringLength(100)]
     public string? Search { get; set; }
 }

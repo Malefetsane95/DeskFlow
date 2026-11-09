@@ -8,6 +8,23 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthorization();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddOpenApi("requester", options =>
+    {
+        options.ShouldInclude = description => description.GroupName == "requester";
+        options.AddDocumentTransformer((document, _, _) =>
+        {
+            document.Info = new()
+            {
+                Title = "DeskFlow Requester API",
+                Version = "v1",
+                Description = "Read-only ticket access for signed-in End Users. Sign in to DeskFlow in this browser before using Try it out; the Swagger UI sends same-origin requests using the existing Identity session cookie. This API does not use or issue API keys or bearer tokens."
+            };
+            return Task.CompletedTask;
+        });
+    });
+}
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddHttpClient<IPrivateObjectStorage, SupabasePrivateObjectStorage>(client =>
     client.Timeout = TimeSpan.FromSeconds(45));
@@ -64,6 +81,18 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi("/openapi/{documentName}.json");
+    app.UseSwaggerUI(options =>
+    {
+        options.RoutePrefix = "swagger";
+        options.DocumentTitle = "DeskFlow Requester API";
+        options.SwaggerEndpoint("/openapi/requester.json", "DeskFlow Requester API v1");
+    });
+}
+
 app.UseRouting();
 
 if (databaseConfigured)
