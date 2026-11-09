@@ -36,14 +36,14 @@ public class StaffTicketsController : Controller
     {
         var query = _db.Tickets.AsNoTracking();
         queueView = queueView?.Trim().ToLowerInvariant();
-        if (queueView is not ("mine" or "unassigned" or "open")) queueView = null;
+        if (queueView is not ("mine" or "unassigned" or "open" or "overdue")) queueView = null;
 
         if (queueView == "mine")
         {
             var userId = _users.GetUserId(User);
             query = userId is null
                 ? query.Where(_ => false)
-                : query.Where(ticket => ticket.Assignments.Any(assignment =>
+                : query.Where(ticket => !ticket.Status.IsFinal && ticket.Assignments.Any(assignment =>
                     assignment.UnassignedAt == null && assignment.TechnicianId == userId));
         }
         else if (queueView == "unassigned")
@@ -52,6 +52,10 @@ public class StaffTicketsController : Controller
                 && !ticket.Assignments.Any(assignment => assignment.UnassignedAt == null));
         }
         else if (queueView == "open")
+        {
+            query = query.Where(ticket => !ticket.Status.IsFinal);
+        }
+        else if (queueView == "overdue")
         {
             query = query.Where(ticket => !ticket.Status.IsFinal);
         }
@@ -69,11 +73,13 @@ public class StaffTicketsController : Controller
                 || ticket.Requester.Email!.Contains(term));
         }
 
-        var rows = await query
+        IQueryable<Ticket> orderedQuery = query
             .OrderBy(ticket => ticket.Status.IsFinal)
             .ThenByDescending(ticket => ticket.Priority.SortOrder)
-            .ThenBy(ticket => ticket.CreatedAt)
-            .Take(150)
+            .ThenBy(ticket => ticket.CreatedAt);
+        if (queueView != "overdue") orderedQuery = orderedQuery.Take(150);
+
+        var rows = await orderedQuery
             .Select(ticket => new StaffTicketRowViewModel
             {
                 Id = ticket.Id,
@@ -104,6 +110,11 @@ public class StaffTicketsController : Controller
                 "Reply", row.CreatedAt, row.ResponseTargetMinutes, row.FirstRespondedAt, now);
             row.ResolutionSla = SlaProgressCalculator.Calculate(
                 "Resolution", row.CreatedAt, row.ResolutionTargetMinutes, row.ResolvedAt, now);
+        }
+        if (queueView == "overdue")
+        {
+            rows = rows.Where(row => row.ResponseSla.StateClass == "overdue"
+                || row.ResolutionSla.StateClass == "overdue").Take(150).ToList();
         }
 
         var statuses = await _db.TicketStatuses.AsNoTracking().OrderBy(status => status.SortOrder)

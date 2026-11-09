@@ -8,6 +8,7 @@
     <a asp-action="Index" asp-route-queueView="mine" asp-route-search="@Model.Search" asp-route-statusCode="@Model.StatusCode" class="queue-view-link @(Model.QueueView == "mine" ? "is-active" : "")" aria-current="@(Model.QueueView == "mine" ? "page" : null)">Mine</a>
     <a asp-action="Index" asp-route-queueView="unassigned" asp-route-search="@Model.Search" asp-route-statusCode="@Model.StatusCode" class="queue-view-link @(Model.QueueView == "unassigned" ? "is-active" : "")" aria-current="@(Model.QueueView == "unassigned" ? "page" : null)">Unassigned</a>
     <a asp-action="Index" asp-route-queueView="open" asp-route-search="@Model.Search" asp-route-statusCode="@Model.StatusCode" class="queue-view-link @(Model.QueueView == "open" ? "is-active" : "")" aria-current="@(Model.QueueView == "open" ? "page" : null)">All open</a>
+    <a asp-action="Index" asp-route-queueView="overdue" asp-route-search="@Model.Search" asp-route-statusCode="@Model.StatusCode" class="queue-view-link @(Model.QueueView == "overdue" ? "is-active" : "")" aria-current="@(Model.QueueView == "overdue" ? "page" : null)">Overdue</a>
 </nav>
 <form method="get" asp-action="Index" class="queue-filters mb-3">
     <input type="hidden" name="queueView" value="@Model.QueueView" />
@@ -20,7 +21,7 @@
 </form>
 @if (Model.Tickets.Count == 0)
 {
-    <div class="empty-state"><div class="empty-mark">✓</div><h2 class="h5">@(Model.QueueView == "mine" ? "Nothing is assigned to you" : Model.QueueView == "unassigned" ? "No requests are waiting for an owner" : Model.QueueView == "open" ? "No open requests" : "No requests match these filters")</h2><p class="text-muted mb-0">@(Model.QueueView == "unassigned" || Model.QueueView == "open" ? "You’re all caught up for this view." : "Try another view or adjust your search.")</p></div>
+    <div class="empty-state"><div class="empty-mark">✓</div><h2 class="h5">@(Model.QueueView == "mine" ? "Nothing is assigned to you" : Model.QueueView == "unassigned" ? "No requests are waiting for an owner" : Model.QueueView == "open" ? "No open requests" : Model.QueueView == "overdue" ? "No requests are past their SLA target" : "No requests match these filters")</h2><p class="text-muted mb-0">@(Model.QueueView is "unassigned" or "open" or "overdue" ? "You’re all caught up for this view." : "Try another view or adjust your search.")</p></div>
 }
 else
 {

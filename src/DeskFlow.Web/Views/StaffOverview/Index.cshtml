@@ -1,0 +1,24 @@
+@model DeskFlow.Web.ViewModels.Staff.StaffOverviewViewModel
+@{ ViewData["Title"] = "Team overview"; }
+<div class="row justify-content-center"><div class="col-xl-10">
+    <header class="mb-4">
+        <p class="eyebrow mb-2">DESKFLOW · IT TEAM</p>
+        <h1 class="h3 mb-1">Team overview</h1>
+        <p class="text-muted mb-0">A quick read on what’s waiting for the team today.</p>
+    </header>
+    <section class="overview-grid" aria-label="Current ticket counts">
+        <a class="overview-card" asp-controller="StaffTickets" asp-action="Index" asp-route-queueView="open">
+            <span class="overview-label">Open requests</span><span class="overview-count">@Model.OpenCount</span><span class="overview-action">See all open <span aria-hidden="true">→</span></span>
+        </a>
+        <a class="overview-card" asp-controller="StaffTickets" asp-action="Index" asp-route-queueView="mine">
+            <span class="overview-label">Assigned to me</span><span class="overview-count">@Model.MineOpenCount</span><span class="overview-action">See my work <span aria-hidden="true">→</span></span>
+        </a>
+        <a class="overview-card" asp-controller="StaffTickets" asp-action="Index" asp-route-queueView="unassigned">
+            <span class="overview-label">Waiting for an owner</span><span class="overview-count">@Model.UnassignedCount</span><span class="overview-action">Find an owner <span aria-hidden="true">→</span></span>
+        </a>
+        <a class="overview-card overview-card-attention" asp-controller="StaffTickets" asp-action="Index" asp-route-queueView="overdue">
+            <span class="overview-label">Past SLA target</span><span class="overview-count">@Model.OverdueSlaCount</span><span class="overview-action">Review overdue <span aria-hidden="true">→</span></span>
+        </a>
+    </section>
+    <div class="overview-footnote small text-muted mt-3">Counts update when you refresh. SLA times use calendar hours.</div>
+</div></div>
