@@ -47,6 +47,7 @@
                                 }
                                 @if (isHelpdeskManager)
                                 {
+                                    <li class="nav-item"><a class="workspace-nav-link @(activeController == "Reports" ? "is-current" : "")" asp-controller="Reports" asp-action="Index">Reports</a></li>
                                     <li class="nav-item"><a class="workspace-nav-link @(activeController == "SlaSettings" ? "is-current" : "")" asp-controller="SlaSettings" asp-action="Index">SLA targets</a></li>
                                 }
                                 @if (isAdministrator)

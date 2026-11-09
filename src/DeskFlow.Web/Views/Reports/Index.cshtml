@@ -1,0 +1,69 @@
+@model DeskFlow.Web.ViewModels.Reports.TicketActivityReportViewModel
+@{ ViewData["Title"] = "Ticket activity"; }
+<div class="row justify-content-center"><div class="col-xl-10">
+    <header class="report-heading mb-4">
+        <div>
+            <p class="eyebrow mb-2">IT TEAM · REPORTS</p>
+            <h1 class="h3 mb-1">Ticket activity</h1>
+            <p class="text-muted mb-0">A simple read on what came in and what got resolved.</p>
+        </div>
+        <form method="get" asp-action="Index" class="report-range-form">
+            <label for="days" class="form-label small mb-1">Show</label>
+            <select id="days" name="days" class="form-select">
+                <option value="7" selected="@(Model.RangeDays == 7)">Last 7 days</option>
+                <option value="30" selected="@(Model.RangeDays == 30)">Last 30 days</option>
+                <option value="90" selected="@(Model.RangeDays == 90)">Last 90 days</option>
+            </select>
+            <button type="submit" class="btn btn-outline-secondary">Update</button>
+        </form>
+    </header>
+
+    <p class="report-period small text-muted mb-3">
+        @Model.StartDate.ToString("d MMM yyyy") – @Model.EndDate.ToString("d MMM yyyy") · UTC
+    </p>
+
+    <section class="report-summary-grid mb-4" aria-label="Ticket summary">
+        <article class="report-stat">
+            <span class="report-stat-label">Opened in range</span>
+            <strong class="report-stat-value">@Model.OpenedCount</strong>
+        </article>
+        <article class="report-stat">
+            <span class="report-stat-label">Resolved in range</span>
+            <strong class="report-stat-value">@Model.ResolvedCount</strong>
+        </article>
+        <a class="report-stat report-stat-link" asp-controller="StaffTickets" asp-action="Index" asp-route-queueView="open">
+            <span class="report-stat-label">Open now</span>
+            <strong class="report-stat-value">@Model.OpenCount</strong>
+            <span class="report-stat-action">Review open requests →</span>
+        </a>
+        <a class="report-stat report-stat-link report-stat-attention" asp-controller="StaffTickets" asp-action="Index" asp-route-queueView="overdue">
+            <span class="report-stat-label">Past SLA target</span>
+            <strong class="report-stat-value">@Model.OverdueSlaCount</strong>
+            <span class="report-stat-action">Review overdue →</span>
+        </a>
+    </section>
+
+    <section class="report-activity-card" aria-labelledby="activity-heading">
+        <header class="report-activity-heading">
+            <div>
+                <h2 id="activity-heading" class="h5 mb-1">Opened and resolved</h2>
+                <p class="small text-muted mb-0">By @Model.BucketName, including quiet periods.</p>
+            </div>
+        </header>
+        <div class="table-responsive">
+            <table class="table report-activity-table mb-0">
+                <caption class="visually-hidden">Tickets opened and resolved by @Model.BucketName from @Model.StartDate to @Model.EndDate, UTC</caption>
+                <thead>
+                    <tr><th scope="col">@Model.BucketName</th><th scope="col" class="text-end">Opened</th><th scope="col" class="text-end">Resolved</th></tr>
+                </thead>
+                <tbody>
+                @foreach (var period in Model.Periods)
+                {
+                    <tr><th scope="row">@period.Label</th><td class="text-end">@period.OpenedCount</td><td class="text-end">@period.ResolvedCount</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <p class="small text-muted mt-3 mb-0">Counts use UTC calendar dates. Overdue includes open requests that have passed either active SLA target.</p>
+</div></div>
