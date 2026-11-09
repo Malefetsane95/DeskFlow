@@ -6,7 +6,7 @@ The project is being built progressively with ASP.NET Core MVC, C#, Entity Frame
 
 ## Project status
 
-**The core requester and staff ticket workflows are in place.** Users can register, sign in, submit requests, track progress, exchange public replies, and receive in-app updates. Staff can manage the shared queue, assign work, update statuses, and add internal notes. See completed [staff queue issue #1](https://github.com/Malefetsane95/DeskFlow/issues/1), [conversation issue #2](https://github.com/Malefetsane95/DeskFlow/issues/2), and [notification issue #3](https://github.com/Malefetsane95/DeskFlow/issues/3).
+**Requester and staff ticket workflows are in place.** Users can register, submit requests, track progress, exchange public replies, attach private files, and receive in-app updates. Staff can manage the shared queue, assign work, update statuses, add internal notes, and access files for tickets. See completed [staff queue issue #1](https://github.com/Malefetsane95/DeskFlow/issues/1), [conversation issue #2](https://github.com/Malefetsane95/DeskFlow/issues/2), [notification issue #3](https://github.com/Malefetsane95/DeskFlow/issues/3), and [private attachments issue #4](https://github.com/Malefetsane95/DeskFlow/issues/4).
 
 ## Planned capabilities
 
@@ -39,7 +39,7 @@ dotnet restore DeskFlow.sln
 dotnet build DeskFlow.sln
 ```
 
-The MVC shell can run locally without a database connection. Identity and database-backed features become available after `ConnectionStrings:DefaultConnection` is set in User Secrets.
+The MVC shell can run locally without a database connection. Identity and database-backed features become available after `ConnectionStrings:DefaultConnection` is set in User Secrets. File uploads also require the private `ticket-attachments` bucket in the Supabase Storage dashboard and a server-side service role key. Never put the service role key in source control or share it in chat.
 
 To set the database connection locally, replace the example values with the host, port, and username from Supabase's **Connect** panel, then run this command in your terminal. Keep the actual connection string private:
 
@@ -53,6 +53,14 @@ Apply the schema and start the web app after the secret is set:
 dotnet tool run dotnet-ef database update --project src/DeskFlow.Web --startup-project src/DeskFlow.Web
 dotnet run --project src/DeskFlow.Web
 ```
+
+Set the Storage service role key locally using the key from your Supabase project's API settings. The project URL and bucket name are already configured in `appsettings.json`:
+
+```powershell
+dotnet user-secrets set "Supabase:ServiceRoleKey" "<your-service-role-key>" --project src/DeskFlow.Web
+```
+
+In Supabase Storage, create a bucket named `ticket-attachments` and leave **Public bucket** turned off. DeskFlow checks the ticket's requester or staff role before issuing a five-minute download link. Uploads allow PNG, JPG, PDF, TXT, and LOG files up to 10 MB each, with five files per ticket.
 
 ## Design documents
 

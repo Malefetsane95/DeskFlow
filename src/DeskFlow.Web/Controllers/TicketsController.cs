@@ -3,6 +3,7 @@ using DeskFlow.Web.Data;
 using DeskFlow.Web.Models;
 using DeskFlow.Web.Services;
 using DeskFlow.Web.ViewModels.Tickets;
+using DeskFlow.Web.ViewModels.Attachments;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -147,6 +148,17 @@ public class TicketsController : Controller
                         Author = comment.Author.Profile!.DisplayName,
                         Body = comment.Body,
                         CreatedAt = comment.CreatedAt
+                    })
+                    .ToList(),
+                Attachments = item.Attachments.OrderBy(attachment => attachment.CreatedAt)
+                    .Select(attachment => new TicketAttachmentViewModel
+                    {
+                        Id = attachment.Id,
+                        FileName = attachment.OriginalFileName,
+                        ContentType = attachment.ContentType,
+                        SizeBytes = attachment.SizeBytes,
+                        UploadedBy = attachment.UploadedBy.Profile!.DisplayName,
+                        CreatedAt = attachment.CreatedAt
                     })
                     .ToList()
             })

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
+using DeskFlow.Web.ViewModels.Attachments;
 
 namespace DeskFlow.Web.ViewModels.Staff;
 
@@ -23,6 +24,7 @@ public class StaffTicketDetailViewModel
     public List<SelectListItem> Technicians { get; init; } = [];
     public List<StaffTicketHistoryViewModel> History { get; init; } = [];
     public List<StaffTicketCommentViewModel> Conversation { get; init; } = [];
+    public List<TicketAttachmentViewModel> Attachments { get; init; } = [];
 }
 
 public class StaffTicketCommentViewModel

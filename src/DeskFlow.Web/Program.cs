@@ -9,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddHttpClient<IPrivateObjectStorage, SupabasePrivateObjectStorage>(client =>
+    client.Timeout = TimeSpan.FromSeconds(45));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var databaseConfigured = !string.IsNullOrWhiteSpace(connectionString);

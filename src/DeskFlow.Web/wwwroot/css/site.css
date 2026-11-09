@@ -84,6 +84,12 @@ body {
 .notification-message { color: #34434a; }
 .notification-read .notification-message { color: #6c7679; }
 .notification-detail { color: #7a8384; font-size: .78rem; }
+.attachment-list { display: grid; gap: .4rem; margin: 0; padding: 0; list-style: none; }
+.attachment-link { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: .3rem 1rem; padding: .55rem .65rem; border-radius: 6px; color: #315d67; text-decoration: none; }
+.attachment-link:hover { background: #f4f6f4; color: #264a52; }
+.attachment-file-name { overflow-wrap: anywhere; font-weight: 600; }
+.attachment-file-meta { color: #7a8384; font-size: .78rem; }
+.attachment-upload { padding-top: .9rem; border-top: 1px solid #eeece7; }
 @media (max-width: 767px) { .staff-ticket-row { grid-template-columns: 1fr auto; gap: .6rem; } .staff-ticket-meta { grid-column: 1; } .staff-ticket-row time { grid-column: 2; grid-row: 1; } .staff-ticket-row .ticket-open { display: none; } }
 @media (max-width: 575px) { .ticket-row { grid-template-columns: 1fr auto; gap: .5rem; } .ticket-open { display: none; } .queue-filters { grid-template-columns: 1fr 1fr; } .queue-filters input { grid-column: 1 / -1; } }
 

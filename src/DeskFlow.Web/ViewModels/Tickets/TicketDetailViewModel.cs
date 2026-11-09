@@ -1,3 +1,5 @@
+using DeskFlow.Web.ViewModels.Attachments;
+
 namespace DeskFlow.Web.ViewModels.Tickets;
 
 public class TicketDetailViewModel
@@ -12,6 +14,7 @@ public class TicketDetailViewModel
     public DateTimeOffset CreatedAt { get; init; }
     public List<TicketTimelineItemViewModel> History { get; init; } = [];
     public List<TicketConversationItemViewModel> Conversation { get; init; } = [];
+    public List<TicketAttachmentViewModel> Attachments { get; init; } = [];
 }
 
 public class TicketTimelineItemViewModel

@@ -2,6 +2,7 @@ using DeskFlow.Web.Data;
 using DeskFlow.Web.Models;
 using DeskFlow.Web.ViewModels.Staff;
 using DeskFlow.Web.ViewModels.Tickets;
+using DeskFlow.Web.ViewModels.Attachments;
 using DeskFlow.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -94,6 +95,7 @@ public class StaffTicketsController : Controller
                 .ThenInclude(assignment => assignment.Technician).ThenInclude(user => user.Profile)
             .Include(item => item.History).ThenInclude(history => history.Actor).ThenInclude(user => user.Profile)
             .Include(item => item.Comments).ThenInclude(comment => comment.Author).ThenInclude(user => user.Profile)
+            .Include(item => item.Attachments).ThenInclude(attachment => attachment.UploadedBy).ThenInclude(user => user.Profile)
             .AsNoTracking()
             .SingleOrDefaultAsync(item => item.Id == id);
 
@@ -360,6 +362,17 @@ public class StaffTicketsController : Controller
                     Body = comment.Body,
                     Visibility = comment.Visibility == CommentVisibility.Internal ? "Internal note · staff only" : "Public reply",
                     CreatedAt = comment.CreatedAt
+                })
+                .ToList(),
+            Attachments = ticket.Attachments.OrderBy(attachment => attachment.CreatedAt)
+                .Select(attachment => new TicketAttachmentViewModel
+                {
+                    Id = attachment.Id,
+                    FileName = attachment.OriginalFileName,
+                    ContentType = attachment.ContentType,
+                    SizeBytes = attachment.SizeBytes,
+                    UploadedBy = attachment.UploadedBy.Profile?.DisplayName ?? attachment.UploadedBy.Email ?? "DeskFlow",
+                    CreatedAt = attachment.CreatedAt
                 })
                 .ToList()
         };
