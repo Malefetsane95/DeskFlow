@@ -1,4 +1,18 @@
 ﻿<!DOCTYPE html>
+@{
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var isTechnician = User.IsInRole(DeskFlow.Web.Models.ApplicationRoles.Technician);
+    var isHelpdeskManager = User.IsInRole(DeskFlow.Web.Models.ApplicationRoles.HelpdeskManager);
+    var isAdministrator = User.IsInRole(DeskFlow.Web.Models.ApplicationRoles.Administrator);
+    var hasStaffWorkspace = isTechnician || isHelpdeskManager;
+    var hasWorkspace = hasStaffWorkspace || isAdministrator;
+    var workspaceName = isAdministrator && hasStaffWorkspace
+        ? "Support team + administration"
+        : isAdministrator ? "Team administration" : "IT support";
+    var activeController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var databaseConfigured = !string.IsNullOrWhiteSpace(
+        ViewContext.HttpContext.RequestServices.GetService<IConfiguration>()?.GetConnectionString("DefaultConnection"));
+}
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -9,7 +23,54 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DeskFlow.Web.styles.css" asp-append-version="true" />
 </head>
-<body>
+<body class="@(hasWorkspace ? "workspace-body" : "requester-body")">
+    @if (hasWorkspace)
+    {
+        <header class="workspace-header">
+            <nav class="navbar navbar-expand-lg workspace-navbar">
+                <div class="container-fluid workspace-navbar-inner">
+                    <a class="navbar-brand workspace-brand" asp-controller="Home" asp-action="Index">
+                        <span class="workspace-brand-mark" aria-hidden="true">D</span>
+                        <span class="workspace-brand-copy"><strong>DeskFlow</strong><small>@workspaceName</small></span>
+                    </a>
+                    <button class="navbar-toggler workspace-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#workspaceNavigation" aria-controls="workspaceNavigation"
+                            aria-expanded="false" aria-label="Toggle workspace navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="navbar-collapse collapse" id="workspaceNavigation">
+                        <div class="workspace-nav-content">
+                            <ul class="navbar-nav workspace-primary-nav" aria-label="Workspace pages">
+                                @if (hasStaffWorkspace)
+                                {
+                                    <li class="nav-item"><a class="workspace-nav-link @(activeController == "StaffOverview" ? "is-current" : "")" asp-controller="StaffOverview" asp-action="Index">Overview</a></li>
+                                    <li class="nav-item"><a class="workspace-nav-link @(activeController == "StaffTickets" ? "is-current" : "")" asp-controller="StaffTickets" asp-action="Index">Team queue</a></li>
+                                }
+                                @if (isHelpdeskManager)
+                                {
+                                    <li class="nav-item"><a class="workspace-nav-link @(activeController == "SlaSettings" ? "is-current" : "")" asp-controller="SlaSettings" asp-action="Index">SLA targets</a></li>
+                                }
+                                @if (isAdministrator)
+                                {
+                                    <li class="nav-item"><a class="workspace-nav-link @(activeController == "AdminUsers" ? "is-current" : "")" asp-controller="AdminUsers" asp-action="Index">Team access</a></li>
+                                }
+                            </ul>
+                            <ul class="navbar-nav workspace-account-nav">
+                                <li class="nav-item workspace-notifications">@await Component.InvokeAsync("UnreadNotifications")</li>
+                                <li class="nav-item"><a class="workspace-account-link" asp-controller="Account" asp-action="Profile">My profile</a></li>
+                                <li class="nav-item">
+                                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                        <button type="submit" class="workspace-account-link workspace-signout">Sign out</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+    }
+    @if (!hasWorkspace)
+    {
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
@@ -24,26 +85,13 @@
                             <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                     </ul>
-                    @if (!string.IsNullOrWhiteSpace(ViewContext.HttpContext.RequestServices.GetService<IConfiguration>()?.GetConnectionString("DefaultConnection")))
+                    @if (databaseConfigured)
                     {
                         <ul class="navbar-nav">
-                            @if (User.Identity?.IsAuthenticated == true)
+                            @if (isAuthenticated)
                             {
                                 <li class="nav-item"><a class="nav-link text-dark" asp-controller="Tickets" asp-action="Index">My requests</a></li>
                                 <li class="nav-item">@await Component.InvokeAsync("UnreadNotifications")</li>
-                                @if (User.IsInRole(DeskFlow.Web.Models.ApplicationRoles.Technician) || User.IsInRole(DeskFlow.Web.Models.ApplicationRoles.HelpdeskManager))
-                                {
-                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="StaffOverview" asp-action="Index">Overview</a></li>
-                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="StaffTickets" asp-action="Index">Team queue</a></li>
-                                }
-                                @if (User.IsInRole(DeskFlow.Web.Models.ApplicationRoles.HelpdeskManager))
-                                {
-                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="SlaSettings" asp-action="Index">SLA targets</a></li>
-                                }
-                                @if (User.IsInRole(DeskFlow.Web.Models.ApplicationRoles.Administrator))
-                                {
-                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="AdminUsers" asp-action="Index">Team access</a></li>
-                                }
                                 <li class="nav-item"><a class="nav-link text-dark" asp-controller="Account" asp-action="Profile">My profile</a></li>
                                 <li class="nav-item">
                                     <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
@@ -62,8 +110,9 @@
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    }
+    <div class="container @(hasWorkspace ? "workspace-content" : "")">
+        <main role="main" class="pb-3 @(hasWorkspace ? "workspace-main" : "")">
             @RenderBody()
         </main>
     </div>
