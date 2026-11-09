@@ -4,17 +4,23 @@
     <div><p class="eyebrow mb-2">DESKFLOW · IT TEAM</p><h1 class="h3 mb-1">Team queue</h1><p class="text-muted mb-0">A shared view of requests waiting for a hand.</p></div>
 </div>
 @if (TempData["StaffNotice"] is string notice) { <div class="alert alert-success" role="status">@notice</div> }
+<nav class="queue-views mb-3" aria-label="Quick ticket views">
+    <a asp-action="Index" asp-route-queueView="mine" asp-route-search="@Model.Search" asp-route-statusCode="@Model.StatusCode" class="queue-view-link @(Model.QueueView == "mine" ? "is-active" : "")" aria-current="@(Model.QueueView == "mine" ? "page" : null)">Mine</a>
+    <a asp-action="Index" asp-route-queueView="unassigned" asp-route-search="@Model.Search" asp-route-statusCode="@Model.StatusCode" class="queue-view-link @(Model.QueueView == "unassigned" ? "is-active" : "")" aria-current="@(Model.QueueView == "unassigned" ? "page" : null)">Unassigned</a>
+    <a asp-action="Index" asp-route-queueView="open" asp-route-search="@Model.Search" asp-route-statusCode="@Model.StatusCode" class="queue-view-link @(Model.QueueView == "open" ? "is-active" : "")" aria-current="@(Model.QueueView == "open" ? "page" : null)">All open</a>
+</nav>
 <form method="get" asp-action="Index" class="queue-filters mb-3">
+    <input type="hidden" name="queueView" value="@Model.QueueView" />
     <label class="visually-hidden" for="search">Search requests</label>
     <input id="search" name="search" value="@Model.Search" class="form-control" placeholder="Search by person, request, or reference" />
     <label class="visually-hidden" for="statusCode">Filter by status</label>
     <select id="statusCode" name="statusCode" asp-items="Model.Statuses" class="form-select"><option value="">All statuses</option></select>
     <button class="btn btn-outline-secondary" type="submit">Filter</button>
-    @if (!string.IsNullOrWhiteSpace(Model.Search) || !string.IsNullOrWhiteSpace(Model.StatusCode)) { <a asp-action="Index" class="btn btn-link text-secondary">Clear</a> }
+    @if (!string.IsNullOrWhiteSpace(Model.Search) || !string.IsNullOrWhiteSpace(Model.StatusCode)) { <a asp-action="Index" asp-route-queueView="@Model.QueueView" class="btn btn-link text-secondary">Clear</a> }
 </form>
 @if (Model.Tickets.Count == 0)
 {
-    <div class="empty-state"><div class="empty-mark">✓</div><h2 class="h5">The queue is clear</h2><p class="text-muted mb-0">There are no requests matching this view.</p></div>
+    <div class="empty-state"><div class="empty-mark">✓</div><h2 class="h5">@(Model.QueueView == "mine" ? "Nothing is assigned to you" : Model.QueueView == "unassigned" ? "No requests are waiting for an owner" : Model.QueueView == "open" ? "No open requests" : "No requests match these filters")</h2><p class="text-muted mb-0">@(Model.QueueView == "unassigned" || Model.QueueView == "open" ? "You’re all caught up for this view." : "Try another view or adjust your search.")</p></div>
 }
 else
 {

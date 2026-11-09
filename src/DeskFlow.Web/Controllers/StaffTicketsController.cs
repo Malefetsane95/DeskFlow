@@ -32,9 +32,30 @@ public class StaffTicketsController : Controller
     }
 
     [HttpGet("")]
-    public async Task<IActionResult> Index(string? search, string? statusCode)
+    public async Task<IActionResult> Index(string? search, string? statusCode, string? queueView)
     {
         var query = _db.Tickets.AsNoTracking();
+        queueView = queueView?.Trim().ToLowerInvariant();
+        if (queueView is not ("mine" or "unassigned" or "open")) queueView = null;
+
+        if (queueView == "mine")
+        {
+            var userId = _users.GetUserId(User);
+            query = userId is null
+                ? query.Where(_ => false)
+                : query.Where(ticket => ticket.Assignments.Any(assignment =>
+                    assignment.UnassignedAt == null && assignment.TechnicianId == userId));
+        }
+        else if (queueView == "unassigned")
+        {
+            query = query.Where(ticket => !ticket.Status.IsFinal
+                && !ticket.Assignments.Any(assignment => assignment.UnassignedAt == null));
+        }
+        else if (queueView == "open")
+        {
+            query = query.Where(ticket => !ticket.Status.IsFinal);
+        }
+
         if (!string.IsNullOrWhiteSpace(statusCode))
         {
             query = query.Where(ticket => ticket.Status.Code == statusCode);
@@ -78,6 +99,7 @@ public class StaffTicketsController : Controller
         {
             Search = search,
             StatusCode = statusCode,
+            QueueView = queueView,
             Statuses = statuses,
             Tickets = rows
         });
