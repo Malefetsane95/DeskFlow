@@ -30,6 +30,7 @@
                             @if (User.Identity?.IsAuthenticated == true)
                             {
                                 <li class="nav-item"><a class="nav-link text-dark" asp-controller="Tickets" asp-action="Index">My requests</a></li>
+                                <li class="nav-item">@await Component.InvokeAsync("UnreadNotifications")</li>
                                 @if (User.IsInRole(DeskFlow.Web.Models.ApplicationRoles.Technician) || User.IsInRole(DeskFlow.Web.Models.ApplicationRoles.HelpdeskManager))
                                 {
                                     <li class="nav-item"><a class="nav-link text-dark" asp-controller="StaffTickets" asp-action="Index">Team queue</a></li>

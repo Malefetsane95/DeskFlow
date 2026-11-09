@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using DeskFlow.Web.Data;
 using DeskFlow.Web.Models;
+using DeskFlow.Web.Services;
 using DeskFlow.Web.ViewModels.Tickets;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -15,11 +16,16 @@ public class TicketsController : Controller
 {
     private readonly ApplicationDbContext _db;
     private readonly UserManager<ApplicationUser> _users;
+    private readonly INotificationService _notifications;
 
-    public TicketsController(ApplicationDbContext db, UserManager<ApplicationUser> users)
+    public TicketsController(
+        ApplicationDbContext db,
+        UserManager<ApplicationUser> users,
+        INotificationService notifications)
     {
         _db = db;
         _users = users;
+        _notifications = notifications;
     }
 
     public async Task<IActionResult> Index()
@@ -98,6 +104,7 @@ public class TicketsController : Controller
             NewValue = "Open",
             OccurredAt = ticket.CreatedAt
         });
+        await _notifications.NotifyNewTicketAsync(ticket, userId);
         await _db.SaveChangesAsync();
         await transaction.CommitAsync();
 
@@ -166,8 +173,8 @@ public class TicketsController : Controller
             return RedirectToAction(nameof(Details), new { id });
         }
 
-        var ticketExists = await _db.Tickets.AnyAsync(ticket => ticket.Id == id && ticket.RequesterId == userId);
-        if (!ticketExists) return NotFound();
+        var ticket = await _db.Tickets.SingleOrDefaultAsync(ticket => ticket.Id == id && ticket.RequesterId == userId);
+        if (ticket is null) return NotFound();
 
         _db.TicketComments.Add(new TicketComment
         {
@@ -177,6 +184,7 @@ public class TicketsController : Controller
             Body = model.Body.Trim(),
             CreatedAt = DateTimeOffset.UtcNow
         });
+        await _notifications.NotifyPublicReplyAsync(ticket, userId, actorIsStaff: false);
         await _db.SaveChangesAsync();
         TempData["CommentNotice"] = "Your reply has been added.";
         return RedirectToAction(nameof(Details), new { id });

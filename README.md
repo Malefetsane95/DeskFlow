@@ -6,7 +6,7 @@ The project is being built progressively with ASP.NET Core MVC, C#, Entity Frame
 
 ## Project status
 
-**The core requester and staff ticket workflows are in place.** Users can register, sign in, submit requests, track progress, and exchange public replies with the IT team. Staff can manage the shared queue, assign work, update statuses, and add internal notes. See the completed [staff queue issue #1](https://github.com/Malefetsane95/DeskFlow/issues/1) and the conversation work in [issue #2](https://github.com/Malefetsane95/DeskFlow/issues/2).
+**The core requester and staff ticket workflows are in place.** Users can register, sign in, submit requests, track progress, exchange public replies, and receive in-app updates. Staff can manage the shared queue, assign work, update statuses, and add internal notes. See completed [staff queue issue #1](https://github.com/Malefetsane95/DeskFlow/issues/1), [conversation issue #2](https://github.com/Malefetsane95/DeskFlow/issues/2), and [notification issue #3](https://github.com/Malefetsane95/DeskFlow/issues/3).
 
 ## Planned capabilities
 

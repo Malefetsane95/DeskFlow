@@ -1,5 +1,6 @@
 using DeskFlow.Web.Data;
 using DeskFlow.Web.Models;
+using DeskFlow.Web.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthorization();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var databaseConfigured = !string.IsNullOrWhiteSpace(connectionString);

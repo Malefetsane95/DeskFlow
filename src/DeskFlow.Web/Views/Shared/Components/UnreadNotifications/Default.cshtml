@@ -1,0 +1,5 @@
+@model int
+<a class="nav-link text-dark notification-nav-link" asp-controller="Notifications" asp-action="Index">
+    Notifications
+    @if (Model > 0) { <span class="notification-count" aria-label="@Model unread notifications">@Math.Min(Model, 99)@(Model > 99 ? "+" : "")</span> }
+</a>

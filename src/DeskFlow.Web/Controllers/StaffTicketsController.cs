@@ -2,6 +2,7 @@ using DeskFlow.Web.Data;
 using DeskFlow.Web.Models;
 using DeskFlow.Web.ViewModels.Staff;
 using DeskFlow.Web.ViewModels.Tickets;
+using DeskFlow.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -17,11 +18,16 @@ public class StaffTicketsController : Controller
 {
     private readonly ApplicationDbContext _db;
     private readonly UserManager<ApplicationUser> _users;
+    private readonly INotificationService _notifications;
 
-    public StaffTicketsController(ApplicationDbContext db, UserManager<ApplicationUser> users)
+    public StaffTicketsController(
+        ApplicationDbContext db,
+        UserManager<ApplicationUser> users,
+        INotificationService notifications)
     {
         _db = db;
         _users = users;
+        _notifications = notifications;
     }
 
     [HttpGet("")]
@@ -126,6 +132,7 @@ public class StaffTicketsController : Controller
             AssignedById = userId,
             AssignedAt = now
         });
+        _notifications.NotifyAssignment(ticket, userId, userId);
         _db.TicketHistory.Add(new TicketHistory
         {
             TicketId = ticket.Id,
@@ -188,6 +195,7 @@ public class StaffTicketsController : Controller
             AssignedById = actorId,
             AssignedAt = now
         });
+        _notifications.NotifyAssignment(ticket, selectedTechnician.Id, actorId);
 
         var selectedName = await _db.UserProfiles.AsNoTracking()
             .Where(profile => profile.UserId == selectedTechnician.Id)
@@ -283,6 +291,10 @@ public class StaffTicketsController : Controller
             CreatedAt = now
         };
         _db.TicketComments.Add(comment);
+        if (model.Visibility == CommentVisibility.Public)
+        {
+            await _notifications.NotifyPublicReplyAsync(ticket, actorId, actorIsStaff: true);
+        }
         if (model.Visibility == CommentVisibility.Public && ticket.FirstRespondedAt is null)
         {
             ticket.FirstRespondedAt = now;
@@ -382,6 +394,7 @@ public class StaffTicketsController : Controller
             NewValue = nextStatus.Name,
             OccurredAt = now
         });
+        _notifications.NotifyStatusChange(ticket, nextStatus.Name, actorId);
     }
 
     private static bool IsActiveAssignmentConflict(DbUpdateException exception) =>

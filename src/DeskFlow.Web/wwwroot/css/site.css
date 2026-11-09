@@ -71,6 +71,19 @@ body {
 .internal-note { border-color: #e4d4af; background: #fbf7ed; }
 .internal-note .conversation-visibility { background: #f0e4c9; color: #76541e; }
 .conversation-composer { padding: 1.1rem; border: 1px solid #e8e5df; border-radius: 9px; background: #f8f7f4; }
+.notification-nav-link { display: flex; align-items: center; gap: .4rem; }
+.notification-count { display: inline-grid; min-width: 1.25rem; height: 1.25rem; place-items: center; padding: 0 .25rem; border-radius: 99px; background: #315d67; color: #fff; font-size: .7rem; font-weight: 700; }
+.notification-list { overflow: hidden; border: 1px solid #e8e5df; border-radius: 10px; background: #fff; }
+.notification-row { display: grid; grid-template-columns: 10px 1fr 18px; align-items: center; gap: .85rem; padding: 1rem 1.2rem; color: inherit; text-decoration: none; border-bottom: 1px solid #eeece7; }
+.notification-row:last-child { border-bottom: 0; }
+.notification-row:hover { background: #f8f8f5; color: inherit; }
+.notification-unread { background: #f6f9f8; }
+.notification-mark { width: 8px; height: 8px; border-radius: 50%; background: transparent; }
+.notification-unread .notification-mark { background: #315d67; }
+.notification-content { display: grid; gap: .2rem; }
+.notification-message { color: #34434a; }
+.notification-read .notification-message { color: #6c7679; }
+.notification-detail { color: #7a8384; font-size: .78rem; }
 @media (max-width: 767px) { .staff-ticket-row { grid-template-columns: 1fr auto; gap: .6rem; } .staff-ticket-meta { grid-column: 1; } .staff-ticket-row time { grid-column: 2; grid-row: 1; } .staff-ticket-row .ticket-open { display: none; } }
 @media (max-width: 575px) { .ticket-row { grid-template-columns: 1fr auto; gap: .5rem; } .ticket-open { display: none; } .queue-filters { grid-template-columns: 1fr 1fr; } .queue-filters input { grid-column: 1 / -1; } }
 

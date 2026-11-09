@@ -1,0 +1,21 @@
+@model IReadOnlyList<DeskFlow.Web.ViewModels.Notifications.NotificationListItemViewModel>
+@{ ViewData["Title"] = "Notifications"; }
+<div class="mb-4"><p class="eyebrow mb-2">DESKFLOW</p><h1 class="h3 mb-1">Notifications</h1><p class="text-muted mb-0">Updates about the requests you follow.</p></div>
+@if (Model.Count == 0)
+{
+    <div class="empty-state"><div class="empty-mark">○</div><h2 class="h5">You’re all caught up</h2><p class="text-muted mb-0">When something changes on a request, you’ll see it here.</p></div>
+}
+else
+{
+    <div class="notification-list">
+    @foreach (var notification in Model)
+    {
+        <a asp-action="Open" asp-route-id="@notification.Id" class="notification-row @(notification.IsRead ? "notification-read" : "notification-unread")">
+            <span class="notification-mark" aria-hidden="true"></span>
+            <span class="notification-content"><span class="notification-message">@notification.Message</span><span class="notification-detail">@notification.TicketReference · @notification.CreatedAt.ToLocalTime().ToString("d MMM yyyy 'at' h:mm tt")</span></span>
+            <span class="ticket-open">›</span>
+        </a>
+    }
+    </div>
+    @if (Model.Count == 50) { <p class="small text-muted mt-3">Showing the 50 most recent notifications.</p> }
+}
