@@ -6,7 +6,7 @@ The project is being built progressively with ASP.NET Core MVC, C#, Entity Frame
 
 ## Project status
 
-**Requester and staff ticket workflows are in place.** Users can register, submit requests, track progress, exchange public replies, attach private files, and receive in-app updates. Staff can manage and filter the shared queue, review an actionable team overview, assign work, update statuses, add internal notes, set SLA targets, and access files for tickets. See completed [staff queue issue #1](https://github.com/Malefetsane95/DeskFlow/issues/1), [conversation issue #2](https://github.com/Malefetsane95/DeskFlow/issues/2), [notification issue #3](https://github.com/Malefetsane95/DeskFlow/issues/3), [private attachments issue #4](https://github.com/Malefetsane95/DeskFlow/issues/4), [queue views issue #5](https://github.com/Malefetsane95/DeskFlow/issues/5), [SLA progress issue #6](https://github.com/Malefetsane95/DeskFlow/issues/6), [SLA settings issue #7](https://github.com/Malefetsane95/DeskFlow/issues/7), and [staff overview issue #9](https://github.com/Malefetsane95/DeskFlow/issues/9).
+**Requester and staff ticket workflows are in place.** Users can register, submit requests, track progress, exchange public replies, attach private files, and receive in-app updates. Staff can manage and filter the shared queue, review an actionable team overview, assign work, update statuses, add internal notes, set SLA targets, access files, and export filtered queue results to CSV. The requester API provides paginated ticket lists and details with public replies only. See completed [staff queue issue #1](https://github.com/Malefetsane95/DeskFlow/issues/1), [conversation issue #2](https://github.com/Malefetsane95/DeskFlow/issues/2), [notification issue #3](https://github.com/Malefetsane95/DeskFlow/issues/3), [private attachments issue #4](https://github.com/Malefetsane95/DeskFlow/issues/4), [queue views issue #5](https://github.com/Malefetsane95/DeskFlow/issues/5), [SLA progress issue #6](https://github.com/Malefetsane95/DeskFlow/issues/6), [SLA settings issue #7](https://github.com/Malefetsane95/DeskFlow/issues/7), [staff overview issue #9](https://github.com/Malefetsane95/DeskFlow/issues/9), [queue CSV issue #11](https://github.com/Malefetsane95/DeskFlow/issues/11), and [requester API issue #12](https://github.com/Malefetsane95/DeskFlow/issues/12).
 
 ## Planned capabilities
 
@@ -68,6 +68,7 @@ Helpdesk Managers can set first-response and resolution targets from 15 minutes 
 
 - [System architecture and development roadmap](architecture-and-roadmap.md)
 - [Database entity relationship diagram](database-erd.md)
+- [Requester ticket API](requester-api.md)
 
 ## Planned phases
 
