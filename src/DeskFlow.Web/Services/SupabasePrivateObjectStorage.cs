@@ -27,7 +27,7 @@ public class SupabasePrivateObjectStorage : IPrivateObjectStorage
         using var request = CreateRequest(
             HttpMethod.Post,
             BuildObjectUrl(settings, objectKey),
-            settings.ServiceRoleKey);
+            settings.SecretKey);
         request.Headers.TryAddWithoutValidation("x-upsert", "false");
         request.Content = new StreamContent(content);
         request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
@@ -49,7 +49,7 @@ public class SupabasePrivateObjectStorage : IPrivateObjectStorage
         using var request = CreateRequest(
             HttpMethod.Post,
             BuildObjectUrl(settings, objectKey, signed: true),
-            settings.ServiceRoleKey);
+            settings.SecretKey);
         request.Content = JsonContent.Create(new { expiresIn = SignedUrlLifetimeSeconds });
 
         using var response = await _httpClient.SendAsync(request, cancellationToken);
@@ -82,7 +82,7 @@ public class SupabasePrivateObjectStorage : IPrivateObjectStorage
     {
         var settings = GetSettings();
         var url = new Uri(settings.ProjectUrl, $"storage/v1/object/{Uri.EscapeDataString(settings.Bucket)}");
-        using var request = CreateRequest(HttpMethod.Delete, url, settings.ServiceRoleKey);
+        using var request = CreateRequest(HttpMethod.Delete, url, settings.SecretKey);
         request.Content = JsonContent.Create(new { prefixes = new[] { objectKey } });
 
         using var response = await _httpClient.SendAsync(request, cancellationToken);
@@ -95,26 +95,26 @@ public class SupabasePrivateObjectStorage : IPrivateObjectStorage
     private StorageSettings GetSettings()
     {
         var rawUrl = _configuration["Supabase:Url"];
-        var serviceRoleKey = _configuration["Supabase:ServiceRoleKey"];
+        var secretKey = _configuration["Supabase:SecretKey"]
+            ?? _configuration["Supabase:ServiceRoleKey"];
         var bucket = _configuration["Supabase:StorageBucket"];
 
         if (!Uri.TryCreate(rawUrl, UriKind.Absolute, out var projectUrl)
             || projectUrl.Scheme != Uri.UriSchemeHttps
-            || string.IsNullOrWhiteSpace(serviceRoleKey)
+            || string.IsNullOrWhiteSpace(secretKey)
             || string.IsNullOrWhiteSpace(bucket))
         {
             throw new InvalidOperationException(
-                "Supabase Storage is not configured. Set Supabase:ServiceRoleKey in User Secrets and create the private ticket-attachments bucket.");
+                "Supabase Storage is not configured. Set Supabase:SecretKey in User Secrets and create the private ticket-attachments bucket.");
         }
 
-        return new StorageSettings(new Uri(projectUrl.ToString().TrimEnd('/') + "/"), serviceRoleKey, bucket);
+        return new StorageSettings(new Uri(projectUrl.ToString().TrimEnd('/') + "/"), secretKey, bucket);
     }
 
-    private static HttpRequestMessage CreateRequest(HttpMethod method, Uri url, string serviceRoleKey)
+    private static HttpRequestMessage CreateRequest(HttpMethod method, Uri url, string secretKey)
     {
         var request = new HttpRequestMessage(method, url);
-        request.Headers.TryAddWithoutValidation("apikey", serviceRoleKey);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", serviceRoleKey);
+        request.Headers.TryAddWithoutValidation("apikey", secretKey);
         return request;
     }
 
@@ -125,7 +125,7 @@ public class SupabasePrivateObjectStorage : IPrivateObjectStorage
         return new Uri(settings.ProjectUrl, prefix + Uri.EscapeDataString(settings.Bucket) + "/" + path);
     }
 
-    private sealed record StorageSettings(Uri ProjectUrl, string ServiceRoleKey, string Bucket);
+    private sealed record StorageSettings(Uri ProjectUrl, string SecretKey, string Bucket);
 
     private sealed class SignedUrlResponse
     {

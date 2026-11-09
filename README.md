@@ -57,7 +57,7 @@ dotnet run --project src/DeskFlow.Web
 Set the Storage service role key locally using the key from your Supabase project's API settings. The project URL and bucket name are already configured in `appsettings.json`:
 
 ```powershell
-dotnet user-secrets set "Supabase:ServiceRoleKey" "<your-service-role-key>" --project src/DeskFlow.Web
+dotnet user-secrets set "Supabase:SecretKey" "<your-supabase-secret-key>" --project src/DeskFlow.Web
 ```
 
 In Supabase Storage, create a bucket named `ticket-attachments` and leave **Public bucket** turned off. DeskFlow checks the ticket's requester or staff role before issuing a five-minute download link. Uploads allow PNG, JPG, PDF, TXT, and LOG files up to 10 MB each, with five files per ticket.
