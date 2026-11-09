@@ -2,6 +2,7 @@
 @{ ViewData["Title"] = "Team queue"; }
 <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
     <div><p class="eyebrow mb-2">DESKFLOW · IT TEAM</p><h1 class="h3 mb-1">Team queue</h1><p class="text-muted mb-0">A shared view of requests waiting for a hand.</p></div>
+    <a asp-action="Export" asp-route-search="@Model.Search" asp-route-statusCode="@Model.StatusCode" asp-route-queueView="@Model.QueueView" class="btn btn-outline-secondary">Export CSV</a>
 </div>
 @if (TempData["StaffNotice"] is string notice) { <div class="alert alert-success" role="status">@notice</div> }
 <nav class="queue-views mb-3" aria-label="Quick ticket views">

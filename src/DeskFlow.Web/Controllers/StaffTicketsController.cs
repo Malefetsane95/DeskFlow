@@ -4,6 +4,8 @@ using DeskFlow.Web.ViewModels.Staff;
 using DeskFlow.Web.ViewModels.Tickets;
 using DeskFlow.Web.ViewModels.Attachments;
 using DeskFlow.Web.Services;
+using System.Globalization;
+using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -129,6 +131,40 @@ public class StaffTicketsController : Controller
             Statuses = statuses,
             Tickets = rows
         });
+    }
+
+    [HttpGet("export")]
+    public async Task<IActionResult> Export(string? search, string? statusCode, string? queueView)
+    {
+        var result = await Index(search, statusCode, queueView);
+        if (result is not ViewResult { Model: StaffTicketListViewModel model })
+        {
+            return BadRequest();
+        }
+
+        var csv = new StringBuilder();
+        AppendCsvRow(csv,
+            "Ticket reference", "Title", "Requester", "Category", "Priority", "Status",
+            "Assigned technician", "Created at", "Response SLA", "Resolution SLA");
+
+        foreach (var ticket in model.Tickets)
+        {
+            AppendCsvRow(csv,
+                ticket.Reference,
+                ticket.Title,
+                ticket.Requester,
+                ticket.Category,
+                ticket.Priority,
+                ticket.Status,
+                ticket.Technician ?? "Unassigned",
+                ticket.CreatedAt.ToString("O", CultureInfo.InvariantCulture),
+                ticket.ResponseSla.State,
+                ticket.ResolutionSla.State);
+        }
+
+        var fileName = $"deskflow-ticket-queue-{DateTimeOffset.UtcNow:yyyyMMdd-HHmmss}.csv";
+        var content = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true).GetBytes(csv.ToString());
+        return File(content, "text/csv; charset=utf-8", fileName);
     }
 
     [HttpGet("{id:long}")]
@@ -468,4 +504,21 @@ public class StaffTicketsController : Controller
         exception.InnerException is PostgresException postgres
         && postgres.SqlState == PostgresErrorCodes.UniqueViolation
         && postgres.ConstraintName == "IX_TicketAssignments_OneActiveAssignmentPerTicket";
+
+    private static void AppendCsvRow(StringBuilder csv, params string?[] fields)
+    {
+        csv.AppendJoin(',', fields.Select(CsvField)).Append("\r\n");
+    }
+
+    private static string CsvField(string? field)
+    {
+        var value = field ?? string.Empty;
+        var formulaCheck = value.TrimStart(' ', '\t', '\r', '\n', '\uFEFF');
+        if (formulaCheck.Length > 0 && "=+-@".Contains(formulaCheck[0]))
+        {
+            value = "'" + value;
+        }
+
+        return "\"" + value.Replace("\"", "\"\"") + "\"";
+    }
 }
